@@ -6,4 +6,16 @@
  * To change this template use File | Settings | File Templates.
  */
 
+(function(){
+// Constructor
+    TouchUI = function (el, options) {
+        alert("go again")
+    };
+// Prototype
+    TouchUI.prototype = {
+        enabled: true,
+        x: 0,
+        y: 0
+    }
+})();
 

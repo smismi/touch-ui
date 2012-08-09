@@ -8,6 +8,12 @@
     <title>Touch-UI Example</title>
     <link rel="stylesheet" href="css/touch-ui.css"/>
     <script type="text/javascript" src="js/touch-ui.js"></script>
+    <script type="text/javascript">
+        var touchObject;
+        function touchLoaded() {
+            touchObject = new TouchUI();
+        }
+    </script>
 </head>
 <body>
 
@@ -19,7 +25,7 @@
 
 
 <script type="text/javascript">
-
+    document.addEventListener('DOMContentLoaded', touchLoaded, false);
 </script>
 </body>
 </html>
