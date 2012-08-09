@@ -11,13 +11,22 @@
     <script type="text/javascript">
         var touchObject;
         function touchLoaded() {
-            touchObject = new TouchUI();
+            touchObject = new TouchUI("header", {
+                onClick: function (e) {
+                    var target = e.target;
+                    while (target.nodeType != 1) target = target.parentNode;
+                    alert(target)
+                }
+            });
+
         }
+
+
     </script>
 </head>
 <body>
 
-<header>header</header>
+<header id="header">header</header>
 
 <section>section</section>
 
