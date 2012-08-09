@@ -12,9 +12,7 @@
         var touchObject;
         function touchLoaded() {
             touchObject = new TouchUI("header", {
-                onClick: function (e) {
-                    var target = e.target;
-                    while (target.nodeType != 1) target = target.parentNode;
+                onScrollStart: function (e) {
                     alert(target)
                 }
             });

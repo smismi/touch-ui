@@ -76,7 +76,6 @@
             useTransition: false,
 
             // Events
-            onClick: null,
             onRefresh: null,
             onBeforeScrollStart: function (e) { e.preventDefault(); },
             onScrollStart: null,
@@ -89,7 +88,10 @@
         };
 
 
-        that._bind(START_EV, window);
+//        that._bind(START_EV, window);
+        that._bind(RESIZE_EV, window);
+        that._bind(START_EV);
+        if (!hasTouch) that._bind('mouseout', that.wrapper);
 
     };
 // Prototype
@@ -110,18 +112,17 @@
             var that = this,
                 point = hasTouch ? e.touches[0] : e,
                 matrix, x, y;
-           console.log(point.type)
-//            that._bind(MOVE_EV);
-//            that._bind(END_EV);
-//            that._bind(CANCEL_EV);
+            that.wrapper.innerHTML = point.clientX + " " + point.clientY;
+//           console.log(point.type + " " + point.clientX + " " + point.clientY)
+
         },
 
         _bind: function (type, el, bubble) {
-            el.addEventListener(type, this, !!bubble);
+            (el || this.wrapper).addEventListener(type, this, !!bubble);
         },
 
         _unbind: function (type, el, bubble) {
-            el.removeEventListener(type, this, !!bubble);
+            (el || this.wrapper).removeEventListener(type, this, !!bubble);
         }
     }
 
