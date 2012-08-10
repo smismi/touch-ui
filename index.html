@@ -8,30 +8,38 @@
     <title>Touch-UI Example</title>
     <link rel="stylesheet" href="css/touch-ui.css"/>
     <script type="text/javascript" src="js/touch-ui.js"></script>
+    <!--<script type="text/javascript" src="js/iscroll-lite.js"></script>-->
     <script type="text/javascript">
-        var touchObject;
+        var touchObject, touchObject2;
         function touchLoaded() {
-            touchObject = new TouchUI("header", {
-                onScrollStart: function (e) {
-                    alert(target);
-                }
-            });
 
+            touchObject2 = new TouchUI(
+                    {
+                        class: "section"
+                    },
+                    {
+                        onTouchEnd:function (e) {
+                            alert('e');
+                        }
+                    });
         }
-
-
     </script>
 </head>
 <body>
 
-<header id="header">header</header>
+<header id="header"><div>header</div></header>
 
-<section>section</section>
+<section id="section"  class="section" >section</section>
+<section id="section2"  class="section" >section2</section>
+<section id="section3"  class="section" >section3</section>
+<section id="section4"  class="section" >section4</section>
+<aside id="log" class="log_fixed">log:</aside>
 
 <footer>footer</footer>
 
 
 <script type="text/javascript">
+    document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
     document.addEventListener('DOMContentLoaded', touchLoaded, false);
 </script>
 </body>
