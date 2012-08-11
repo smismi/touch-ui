@@ -54,16 +54,16 @@
         var that = this,
             doc = document,
             i;
-//        that.wrapper = typeof el == 'object' ? el : doc.getElementById(el);
+        that.wrapper = typeof el == 'object' ? el : doc.getElementById(el);
 
 //        that.wrapper = typeof el == 'object' ? doc.getElementsByClassName(el.class) : doc.getElementById(el);
-        if (typeof el == 'object') {
-            for(var k = 0, j=doc.getElementsByClassName(el.class).length; k<j; k++){
-                that.wrapper = doc.getElementsByClassName(el.class)[k];
-            }
-        } else {
-            that.wrapper = typeof el == 'object' ? el : doc.getElementById(el);
-        }
+//        if (typeof el == 'object') {
+//            for(var k = 0, j=doc.getElementsByClassName(el.class).length; k<j; k++){
+//                that.wrapper = doc.getElementsByClassName(el.class)[k];
+//            }
+//        } else {
+//            that.wrapper = typeof el == 'object' ? el : doc.getElementById(el);
+//        }
 
 
 //        console.log(that.wrapper);
@@ -81,7 +81,7 @@
             bounceLock: false,
             momentum: true,
             lockDirection: true,
-            useTransform: true,
+            useTransform: false,
             useTransition: false,
 
             // Events
@@ -126,15 +126,29 @@
             this.refresh();
         },
         _start: function (e) {
-            var that = this;
+            var that = this,
+                point = hasTouch ? e.touches[0] : e,
+                matrix, x, y;
             that.started = true;
             that.moved = false;
+            that.animating = false;
+            that.zoomed = false;
+            that.distX = 0;
+            that.distY = 0;
+            that.absDistX = 0;
+            that.absDistY = 0;
+            that.dirX = 0;
+            that.dirY = 0;
+            that.startX = that.x;
+            that.startY = that.y;
+            that.pointX = point.pageX;
+            that.pointY = point.pageY;
 //            if (that.options.onBeforeScrollStart) that.options.onBeforeScrollStart.call(that, e);
 //            if (that.options.onScrollStart) that.options.onScrollStart.call(that, e);
 //            if (that.options.onScrollMove) that.options.onScrollMove.call(that, e);
 
 
-            this._simple_log('_start');
+          //  this._simple_log('_start');
 //            that.startTime = e.timeStamp || Date.now();
             that._bind(MOVE_EV);
             that._bind(END_EV);      //биндится отпускание
@@ -143,17 +157,80 @@
         },
 
         _move: function (e) {
-            var that = this;
+            var that = this,
+                point = hasTouch ? e.touches[0] : e,
+                deltaX = point.pageX - that.pointX,
+                deltaY = point.pageY - that.pointY,
+                newX = that.x + deltaX,
+                newY = that.y + deltaY,
+                timestamp = e.timeStamp || Date.now();
+
+            this._simple_log(deltaX + ' ' + deltaY);
+            if (that.options.onBeforeScrollMove) that.options.onBeforeScrollMove.call(that, e);
+
+            that.pointX = point.pageX;
+            that.pointY = point.pageY;
+
+            that.distX += deltaX;
+            that.distY += deltaY;
+            that.absDistX = m.abs(that.distX);
+            that.absDistY = m.abs(that.distY);
+
+            if (that.absDistX < 6 && that.absDistY < 6) {
+                return;
+            }
+
+            // Lock direction
+            if (that.options.lockDirection) {
+                if (that.absDistX > that.absDistY + 5) {
+                    newY = that.y;
+                    deltaY = 0;
+                } else if (that.absDistY > that.absDistX + 5) {
+                    newX = that.x;
+                    deltaX = 0;
+                }
+            }
+
+          //  that.moved = true;
+            that._pos(newX, newY);
+            that.dirX = deltaX > 0 ? -1 : deltaX < 0 ? 1 : 0;
+            that.dirY = deltaY > 0 ? -1 : deltaY < 0 ? 1 : 0;
+
+            if (timestamp - that.startTime > 300) {
+                that.startTime = timestamp;
+                that.startX = that.x;
+                that.startY = that.y;
+            }
+
+            if (that.options.onScrollMove) that.options.onScrollMove.call(that, e);
+
+
+
             if (that.started) {
-                that._simple_log('_move');
+          //      that._simple_log('_move');
                 that.moved = true;
             }
 
         },
+        _pos: function (x, y) {
+            x = this.hScroll ? x : 0;
+            y = this.vScroll ? y : 0;
 
+            if (this.options.useTransform) {
+                this.wrapper.style[vendor + 'Transform'] = trnOpen + x + 'px,' + y + 'px' + trnClose + ' scale(' + this.scale + ')';
+            } else {
+                x = mround(x);
+                y = mround(y);
+                this.wrapper.style.left = x + 'px';
+                this.wrapper.style.top = y + 'px';
+            }
+
+            this.x = x;
+            this.y = y;
+        },
         _end: function (e) {
             var that = this;
-            that._simple_log('_end');
+         //   that._simple_log('_end');
 
             if (!that.moved) {
                 if (that.options.onTouchEnd) that.options.onTouchEnd.call(that, e);

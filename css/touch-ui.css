@@ -21,4 +21,10 @@ body {
     font-size: 10px;
     background: #000;
     color: #3dff18;
+    overflow: auto;
+}
+
+.section {
+    width: 300px;
+    position: relative;
 }

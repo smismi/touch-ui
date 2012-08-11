@@ -10,29 +10,57 @@
     <script type="text/javascript" src="js/touch-ui.js"></script>
     <!--<script type="text/javascript" src="js/iscroll-lite.js"></script>-->
     <script type="text/javascript">
-        var touchObject, touchObject2;
+        var touchObject;
         function touchLoaded() {
-
-            touchObject2 = new TouchUI(
+            touchObject = new TouchUI("mainflow",
                     {
-                        class: "section"
-                    },
-                    {
+                        hScroll: false,
+                        vScroll: true,
                         onTouchEnd:function (e) {
-                            alert('e');
+                            //alert(this.options.hScroll + " " + this.options.vScroll);
                         }
                     });
+
+
+            var startTime = Date.now();
+            for(var k = 0, j=document.getElementsByClassName('section').length; k<j; k++){
+
+                (function() {
+                    var u = k;
+                    new TouchUI(
+                            document.getElementsByClassName('section')[k],
+                            {
+                                hScroll: true,
+                                vScroll: false,
+                                onTouchEnd:function (e) {
+                                 //   alert(this.options.hScroll + " " + this.options.vScroll);
+                                }
+                            });
+
+                })();
+            }
+//            touchObject2 = new TouchUI(
+//                    {
+//                        class: "section"
+//                    },
+//                    {
+//                        onTouchEnd:function (e) {
+//                            alert('e');
+//                        }
+//                    });
+            var finishTime = Date.now();
+            TouchUI.prototype._simple_log(finishTime - startTime + ' ' + k);
         }
     </script>
 </head>
-<body>
+<body id="mainflow">
 
 <header id="header"><div>header</div></header>
 
-<section id="section"  class="section" >section</section>
-<section id="section2"  class="section" >section2</section>
-<section id="section3"  class="section" >section3</section>
-<section id="section4"  class="section" >section4</section>
+<section class="section" >section</section>
+<section  class="section" >section2</section>
+<section  class="section" >section3</section>
+<section  class="section" >section4</section>
 <aside id="log" class="log_fixed">log:</aside>
 
 <footer>footer</footer>
