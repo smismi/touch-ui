@@ -75,8 +75,8 @@
         that.options = {
             hScroll: true,
             vScroll: true,
-            x: 0,
-            y: 0,
+            x: 1,
+            y: 2,
             bounce: true,
             bounceLock: false,
             momentum: true,
@@ -97,8 +97,7 @@
         };
         // User defined options
         for (i in options) that.options[i] = options[i];
-
-//        that._bind(START_EV, window);
+        that.refresh();
         that._bind(RESIZE_EV, window);
         that._bind(START_EV);
         if (!hasTouch) that._bind('mouseout', that.wrapper);
@@ -127,8 +126,7 @@
         },
         _start: function (e) {
             var that = this,
-                point = hasTouch ? e.touches[0] : e,
-                matrix, x, y;
+                point = hasTouch ? e.touches[0] : e ;
             that.started = true;
             that.moved = false;
             that.animating = false;
@@ -148,7 +146,7 @@
 //            if (that.options.onScrollMove) that.options.onScrollMove.call(that, e);
 
 
-          //  this._simple_log('_start');
+            this._simple_log('_start');
 //            that.startTime = e.timeStamp || Date.now();
             that._bind(MOVE_EV);
             that._bind(END_EV);      //биндится отпускание
@@ -165,72 +163,46 @@
                 newY = that.y + deltaY,
                 timestamp = e.timeStamp || Date.now();
 
-            this._simple_log(deltaX + ' ' + deltaY);
-            if (that.options.onBeforeScrollMove) that.options.onBeforeScrollMove.call(that, e);
 
-            that.pointX = point.pageX;
-            that.pointY = point.pageY;
-
-            that.distX += deltaX;
-            that.distY += deltaY;
-            that.absDistX = m.abs(that.distX);
-            that.absDistY = m.abs(that.distY);
-
-            if (that.absDistX < 6 && that.absDistY < 6) {
-                return;
-            }
-
-            // Lock direction
-            if (that.options.lockDirection) {
-                if (that.absDistX > that.absDistY + 5) {
-                    newY = that.y;
-                    deltaY = 0;
-                } else if (that.absDistY > that.absDistX + 5) {
-                    newX = that.x;
-                    deltaX = 0;
-                }
-            }
 
           //  that.moved = true;
             that._pos(newX, newY);
-            that.dirX = deltaX > 0 ? -1 : deltaX < 0 ? 1 : 0;
-            that.dirY = deltaY > 0 ? -1 : deltaY < 0 ? 1 : 0;
-
-            if (timestamp - that.startTime > 300) {
-                that.startTime = timestamp;
-                that.startX = that.x;
-                that.startY = that.y;
-            }
-
-            if (that.options.onScrollMove) that.options.onScrollMove.call(that, e);
 
 
 
             if (that.started) {
-          //      that._simple_log('_move');
                 that.moved = true;
             }
 
         },
         _pos: function (x, y) {
+            var that = this;
+            if (that.moved) {
+                that._simple_log('_pos');
+                this.x = x;
+                this.y = y;
+
+                this.hScroll = this.x;
+                this.vScroll = this.y;
             x = this.hScroll ? x : 0;
             y = this.vScroll ? y : 0;
+//
+//            this.x++;
+//            this.y++;
+//            if (this.options.useTransform) {
+//                this.wrapper.style[vendor + 'Transform'] = trnOpen + x + 'px,' + y + 'px' + trnClose + ' scale(' + this.scale + ')';
+//            } else {
+//                x = mround(x);
+//                y = mround(y);
 
-            if (this.options.useTransform) {
-                this.wrapper.style[vendor + 'Transform'] = trnOpen + x + 'px,' + y + 'px' + trnClose + ' scale(' + this.scale + ')';
-            } else {
-                x = mround(x);
-                y = mround(y);
                 this.wrapper.style.left = x + 'px';
                 this.wrapper.style.top = y + 'px';
-            }
-
-            this.x = x;
-            this.y = y;
+//             }
+        }
         },
         _end: function (e) {
             var that = this;
-         //   that._simple_log('_end');
+            that._simple_log('_end');
 
             if (!that.moved) {
                 if (that.options.onTouchEnd) that.options.onTouchEnd.call(that, e);
@@ -252,6 +224,17 @@
         },
 
 //utils
+//        _offset: function (el) {
+//            var left = -el.offsetLeft,
+//                top = -el.offsetTop;
+//
+//            while (el = el.offsetParent) {
+//                left -= el.offsetLeft;
+//                top -= el.offsetTop;
+//            }
+//
+//            return { left: left, top: top };
+//        },
         _log: function (e) {
             var that = this,
                 point = hasTouch ? e.touches[0] : e,
@@ -277,8 +260,11 @@
 //            that.pointX = point.pageX;
 //            that.pointY = point.pageY;
         },
-        refresh: function (e, text) {
-//           console.log('refresh');
+        refresh: function () {
+            var that = this,
+                offset;
+            console.log('refresh');
+
         }
     }
 

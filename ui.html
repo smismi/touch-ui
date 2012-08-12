@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>Touch-UI Example</title>
+    <link rel="stylesheet" href="css/touch-ui.css"/>
+    <script type="text/javascript" src="js/ui.js"></script>
+    <script type="text/javascript" src="js/dom.js"></script>
+    <script type="text/javascript">
+        function UILoaded() {
+
+            document.getElementById('section').addClass
+            (function() {
+                new UI(
+                    document.getElementById('section'),
+                    {
+                    });
+            })();
+        }
+    </script>
+</head>
+<body id="mainflow">
+
+    <header id="header"><div>header</div></header>
+
+    <section class="section" >section</section>
+    <section  class="section" >section2</section>
+    <section  class="section" >section3</section>
+    <section  class="section" >section4</section>
+    <aside id="log" class="log_fixed">log:</aside>
+
+    <footer>footer</footer>
+
+
+    <script type="text/javascript">
+        document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+        document.addEventListener('DOMContentLoaded', UILoaded, false);
+    </script>
+</body>
+</html>

@@ -28,3 +28,6 @@ body {
     width: 300px;
     position: relative;
 }
+#header {
+    position: relative;
+}

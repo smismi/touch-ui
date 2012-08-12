@@ -12,8 +12,9 @@
     <script type="text/javascript">
         var touchObject;
         function touchLoaded() {
-            touchObject = new TouchUI("mainflow",
+            touchObject = new TouchUI("header",
                     {
+                        x:11, y:22,
                         hScroll: false,
                         vScroll: true,
                         onTouchEnd:function (e) {
@@ -30,6 +31,7 @@
                     new TouchUI(
                             document.getElementsByClassName('section')[k],
                             {
+                                x:31, y:32,
                                 hScroll: true,
                                 vScroll: false,
                                 onTouchEnd:function (e) {
