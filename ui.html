@@ -8,13 +8,19 @@
     <title>Touch-UI Example</title>
     <link rel="stylesheet" href="css/touch-ui.css"/>
     <script type="text/javascript" src="js/ui.js"></script>
-    <script type="text/javascript" src="js/dom.js"></script>
+    <!--<script type="text/javascript" src="js/dom.js"></script>-->
     <script type="text/javascript">
         function UILoaded() {
 
             (function() {
                 new UI(
                     document.getElementById('section'),
+                    {
+                    });
+            })();
+            (function() {
+                new UI(
+                    document.getElementById('header'),
                     {
                     });
             })();
@@ -25,7 +31,7 @@
 
     <header id="header"><div>header</div></header>
 
-    <section class="section" >section</section>
+    <section class="section" id="section" >section</section>
     <section  class="section" >section2</section>
     <section  class="section" >section3</section>
     <section  class="section" >section4</section>
