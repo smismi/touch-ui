@@ -26,7 +26,7 @@
         y: 0,
         w: 0,
         h: 0,
-
+        scrollHeight: 0,
 
 
 
@@ -41,7 +41,7 @@
 
 
 //        coord = _this._getCoords(el);
-        var scrollHeight = el.scrollHeight;
+        scrollHeight = el.scrollHeight;
         var wrapperHeight =  el.clientHeight;
 
         var scrollerHeight = wrapperHeight * el.clientHeight / el.scrollHeight;
@@ -54,36 +54,22 @@
     },
     _move: function (deltaY) {
         var _this = this;
-//        _this._log(deltaY + " " + _this.y);
 
-//        if ((_this.y <= 0 && deltaY <= 0) || (_this.y >= 0 && deltaY >= 0) ) {
-//            g_delta += deltaY;
-//        } else {
-//            return;
-//        }
+
+
         _this.y += deltaY/4;
         _this.scroller.style.position = 'absolute';
-        switch(deltaY)
-        {
-            case 120:
 
-                _this._log(_this.y + ' ' + _this.h);
+//                _this._log(_this.y + ' ' + _this.h);
                 _this.scroller.style.top = _this.y + 'px';
                 g_delta += _this.y;
 
-                break;
-            case -120:
-                _this._log(_this.y + ' ' + _this.h);
-                _this.scroller.style.top = _this.y + 'px';
-                g_delta += _this.y;
-                break;
-
-        }
 
 
 
 
-       _this._log(deltaY + " " + g_delta);
+
+//       _this._log(deltaY + " " + g_delta);
 
     },
 
@@ -109,7 +95,18 @@
                 }
 
 //                _this._log(e.wheelDelta + " " + g_delta);
-                _this._move(e.wheelDelta);
+                if (_this.y <= 0 && e.wheelDelta > 0) {
+                    _this._log('up');
+
+                    _this._move(e.wheelDelta);
+                }
+
+                if ((Math.abs(_this.y) < _this.h) && e.wheelDelta < 0) {
+                    _this._log('down');
+                    _this._log(Math.abs(_this.y) + " " + _this.h);
+                    _this._move(e.wheelDelta);
+                }
+
 
                 // отменить действие по умолчанию (прокрутку элемента/страницы)
                 e.preventDefault ? e.preventDefault() : (e.returnValue = false);
