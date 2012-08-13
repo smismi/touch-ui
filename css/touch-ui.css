@@ -31,3 +31,26 @@ body {
 #header {
     position: relative;
 }
+
+#scroll {
+    width: 100px;
+    height: 200px;
+    border: 1px solid red;
+    background: #fff;
+    font-size: 12px;
+}
+.scrollwrapper {
+    position: relative;
+    overflow: hidden;
+}
+.scrollbar {
+    position: absolute;
+    right:0;
+    top:0;
+    height:100%;
+    background: #888;
+    width: 5px;
+    border-radius: 2px;
+    opacity: 0.8;
+
+}
