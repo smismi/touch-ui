@@ -21,7 +21,11 @@
     };
 // Prototype
     UI.prototype = {
-
+        enabled: true,
+        x: 0,
+        y: 0,
+        w: 0,
+        h: 0,
 
 
 
@@ -36,24 +40,50 @@
         el.appendChild(scrollbar);
 
 
-        coord = _this._getCoords(el);
+//        coord = _this._getCoords(el);
         var scrollHeight = el.scrollHeight;
         var wrapperHeight =  el.clientHeight;
 
         var scrollerHeight = wrapperHeight * el.clientHeight / el.scrollHeight;
         scrollbar.style.height = scrollerHeight + 'px';
-        _this._log('draw');
-        _this._log('coord = ' + coord.top + ' ' + coord.left);
-        _this._log('scrollerHeight = ' + wrapperHeight + ' ' + scrollerHeight);
+//        _this._log('draw');
+//        _this._log('coord = ' + coord.top + ' ' + coord.left);
+//        _this._log('scrollerHeight = ' + wrapperHeight + ' ' + scrollerHeight);
+        _this.h = scrollHeight;
 
     },
     _move: function (deltaY) {
         var _this = this;
-        g_delta += deltaY;
-        _this.scroller.style.position = 'absolute';
+//        _this._log(deltaY + " " + _this.y);
 
-        _this.scroller.style.top = g_delta/4 + 'px';
-//        _this._log(deltaY + " " + g_delta);
+//        if ((_this.y <= 0 && deltaY <= 0) || (_this.y >= 0 && deltaY >= 0) ) {
+//            g_delta += deltaY;
+//        } else {
+//            return;
+//        }
+        _this.y += deltaY/4;
+        _this.scroller.style.position = 'absolute';
+        switch(deltaY)
+        {
+            case 120:
+
+                _this._log(_this.y + ' ' + _this.h);
+                _this.scroller.style.top = _this.y + 'px';
+                g_delta += _this.y;
+
+                break;
+            case -120:
+                _this._log(_this.y + ' ' + _this.h);
+                _this.scroller.style.top = _this.y + 'px';
+                g_delta += _this.y;
+                break;
+
+        }
+
+
+
+
+       _this._log(deltaY + " " + g_delta);
 
     },
 
