@@ -8,15 +8,15 @@
 
 (function(){
     var m = Math;
-
+    var g_delta = 0;
 
     // Constructor
     UI = function (el, options) {
         var _this = this;
+        _this.scroller = el.children[0];
 
-
-            _this._drawScroll(el);
-
+        _this._drawScroll(el);
+        _this._bindMouseScroll(el);
 
     };
 // Prototype
@@ -33,7 +33,6 @@
         var scrollbar = document.createElement("div");
         _this._addClass(scrollbar, 'scrollbar');
         _this._addClass(el, 'scrollwrapper');
-        _this._addClass(el, 'scrollwrapper');
         el.appendChild(scrollbar);
 
 
@@ -48,10 +47,44 @@
         _this._log('scrollerHeight = ' + wrapperHeight + ' ' + scrollerHeight);
 
     },
+    _move: function (deltaY) {
+        var _this = this;
+        g_delta += deltaY;
+        _this.scroller.style.position = 'absolute';
+
+        _this.scroller.style.top = g_delta/4 + 'px';
+//        _this._log(deltaY + " " + g_delta);
+
+    },
 
 
 //    utils
+        _bindMouseScroll: function(elem) {
+            var _this = this;
+            if (elem.addEventListener) {
+                // IE9+, Opera, Chrome/Safari (можно onmousehweel = ...)
+                elem.addEventListener ("mousewheel", onMouseWheel, false);
+                // Firefox (нельзя onDOMMouseScroll = ..., только addEventListener)
+                elem.addEventListener ("DOMMouseScroll", onMouseWheel, false);
+            } else { // IE<9
+                elem.attachEvent ("onmousewheel", onMouseWheel);
+            }
 
+
+            function onMouseWheel(e) {
+                e = e || event;
+
+                if (!e.wheelDelta) {
+                    e.wheelDelta = -40*e.detail; // для Firefox
+                }
+
+//                _this._log(e.wheelDelta + " " + g_delta);
+                _this._move(e.wheelDelta);
+
+                // отменить действие по умолчанию (прокрутку элемента/страницы)
+                e.preventDefault ? e.preventDefault() : (e.returnValue = false);
+            }
+        },
         _getCoords: function(elem) {
             var box = elem.getBoundingClientRect();
 
