@@ -7,14 +7,14 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <title>Touch-UI Example</title>
     <link rel="stylesheet" href="css/touch-ui.css"/>
-    <script type="text/javascript" src="js/ui.js"></script>
     <script type="text/javascript" src="js/dom.js"></script>
+    <script type="text/javascript" src="js/ui.js"></script>
     <script type="text/javascript">
         function UILoaded() {
 
             (function() {
                 new UI(
-                    document.getElementById('section'),
+                    document.getElementById('scroll'),
                     {
                     });
             })();
@@ -23,13 +23,40 @@
 </head>
 <body id="mainflow">
 
-    <header id="header"><div>header</div></header>
+    <header id="header"><div>header</div><div>header</div></header>
 
-    <section class="section" >section</section>
-    <section  class="section" >section2</section>
-    <section  class="section" >section3</section>
-    <section  class="section" >section4</section>
+
+    <div id="scroll">
+        <ul>
+            <li>Посещаемость  </li>
+            <li>Источники     </li>
+            <li>Посетители    </li>
+            <li>Содержание    </li>
+            <li>Конверсии     </li>
+            <li>Поведение     </li>
+            <li>Технологии    </li>
+            <li>Конструктор   </li>
+            <li>Мониторинг    </li>
+            <li>Конверсии     </li>
+            <li>Поведение     </li>
+            <li>Технологии    </li>
+            <li>Конструктор   </li>
+            <li>Мониторинг    </li>
+        </ul>
+    </div>
+
+    <!--<section class="section">section</section>-->
+    <!--<section  class="section" >section2</section>-->
+    <!--<section  class="section" >section3</section>-->
+    <!--<section  class="section" >section4</section>-->
+
+
+
+
+
     <aside id="log" class="log_fixed">log:</aside>
+
+
 
     <footer>footer</footer>
 
