@@ -9,10 +9,10 @@
 (function(){
     var m = Math;
     var g_delta = 0;
-
     // Constructor
     UI = function (el, options) {
         var _this = this;
+        _this.wrapper = el;
         _this.scroller = el.children[0];
 
         _this._drawScroll(el);
@@ -26,50 +26,32 @@
         y: 0,
         w: 0,
         h: 0,
-        scrollHeight: 0,
-
-
-
-
-
+        scrollerHeight: 0,
+        wrapperHeight: 0,
     _drawScroll: function (el) {
         var _this = this;
-        var scrollbar = document.createElement("div");
-        _this._addClass(scrollbar, 'scrollbar');
+        _this.scrollbar = document.createElement("div");
+        _this._addClass(_this.scrollbar, 'scrollbar');
         _this._addClass(el, 'scrollwrapper');
-        el.appendChild(scrollbar);
+        el.appendChild(_this.scrollbar);
 
 
 //        coord = _this._getCoords(el);
-        scrollHeight = el.scrollHeight;
-        var wrapperHeight =  el.clientHeight;
+        _this.scrollerHeight = el.scrollHeight;
+        _this.wrapperHeight =  el.clientHeight;
 
-        var scrollerHeight = wrapperHeight * el.clientHeight / el.scrollHeight;
-        scrollbar.style.height = scrollerHeight + 'px';
-//        _this._log('draw');
-//        _this._log('coord = ' + coord.top + ' ' + coord.left);
-//        _this._log('scrollerHeight = ' + wrapperHeight + ' ' + scrollerHeight);
-        _this.h = scrollHeight;
+        var scrollhandlerHeight = _this.wrapperHeight * _this.wrapperHeight / _this.scrollerHeight;
+        _this.scrollbar.style.height = scrollhandlerHeight + 'px';
 
     },
     _move: function (deltaY) {
         var _this = this;
-
-
-
         _this.y += deltaY/4;
         _this.scroller.style.position = 'absolute';
+        _this.scroller.style.top = _this.y + 'px';
+        g_delta += _this.y;
 
-//                _this._log(_this.y + ' ' + _this.h);
-                _this.scroller.style.top = _this.y + 'px';
-                g_delta += _this.y;
-
-
-
-
-
-
-//       _this._log(deltaY + " " + g_delta);
+        _this.scrollbar.style.top = -_this.y * _this.wrapperHeight / _this.scrollerHeight + 'px';
 
     },
 
@@ -89,21 +71,17 @@
 
             function onMouseWheel(e) {
                 e = e || event;
-
                 if (!e.wheelDelta) {
                     e.wheelDelta = -40*e.detail; // для Firefox
                 }
-
-//                _this._log(e.wheelDelta + " " + g_delta);
-                if (_this.y <= 0 && e.wheelDelta > 0) {
+                if (_this.y < 0 && e.wheelDelta > 0) {
                     _this._log('up');
-
                     _this._move(e.wheelDelta);
                 }
 
-                if ((Math.abs(_this.y) < _this.h) && e.wheelDelta < 0) {
+                if ((Math.abs(_this.y) < (_this.scrollerHeight - _this.wrapperHeight)) && e.wheelDelta < 0) {
                     _this._log('down');
-                    _this._log(Math.abs(_this.y) + " " + _this.h);
+                    _this._log(m.abs(_this.y) + " " + _this.scrollerHeight - _this.wrapperHeight);
                     _this._move(e.wheelDelta);
                 }
 
