@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>TRY Example</title>
+    <script type="text/javascript" src="js/try.js"></script>
+    <!--ucFirst("вася") == "Вася";-->
+    <!--ucFirst("") == ""; // нет ошибок при пустой строке-->
+    <!--P.S. В JavaScript нет встроенного метода для этого. Создайте функцию, используя toUpperCase() и charAt().-->
+    <script type="text/javascript">
+
+        function doFirstCharUpper (str) {
+            if (str.length > 0) {
+                firstL = str.charAt(0).toUpperCase();
+                str = firstL + str.substr(1);
+            } else {
+                str = "к сожалению строчка какаято пустоватая"
+            }
+            console.log(str);
+        }
+        function checkSpam (str) {
+            var strLowerCased = str.toLowerCase();
+
+            if (~strLowerCased.indexOf("xxx") || ~strLowerCased.indexOf("viagra"))
+                {
+                    return true
+                } else {
+                    return  "к сожалению строчка какаято непошловатая"
+            }
+        }
+        function truncate (str, maxlength) {
+            if (maxlength <= 0) return "неправильный параметр"
+             if (str.length > maxlength) {
+                 str = str.slice(0, maxlength - 1) + "…"
+             }
+            return str;
+        }
+        function promt100() {
+
+            do {
+                var years=prompt('введите что нибудь больше ста');
+
+            } while (years < 100 && years != null);
+
+            alert("число было" + years);
+        }
+        function weirdNubmer(n) {
+            i=0;
+
+            var srt = "простые числа в этом интервале:";
+            case1: for (i; i <= n; i++) {  // перебор всех чисел
+
+                console.log("взяли число " + i);
+                if (i < 2) continue;
+                console.log("о!, " + i + " больше двух");
+                console.log("ПИСАТЬ пока НЕЛЬЗЯ .." + i);
+                var write = false;
+                var j = 2;
+
+                for (j; j <= i; j++) {                   //поочередно делим их на от 2 до n
+
+                    var write = false;
+                    console.log("берем" + i + " " + j + "и смотрим можно ли цело разделить i на j");
+
+
+                    if ((i % j == 0) && (i != j)) {
+                        console.log("БРЕЙК");
+                        break;
+                    }    // уже разделилось
+                    console.log(i + " на" + j + "не делится прем дальше");
+
+
+                    write = true;
+                }
+                if (write) srt += " " + i;
+
+            }
+            alert(srt)
+
+        }
+
+        function switchBlade() {
+
+            var a = +prompt('a?', '');
+
+            switch(a) {
+                case 0: alert("0"); break
+                case 1: alert("1"); break
+                case 2:
+                case 3: alert("2/3"); break
+
+                default: alert(a)
+            }
+
+        }
+
+        function switchBladeIf() {
+            var err = "";
+
+            var a = +prompt('a?', '');
+                if (a>10) {
+                    err += "больше десяточки ";
+                } if (a<100) {
+                    err += "меньше соточки ";
+                } if (a<50) {
+                    err += "меньше 50 ";
+                } if (a<75) {
+                    err += "меньше 75 ";
+                }
+
+            alert(err);
+        }
+
+        function lesson() {
+//            doFirstCharUpper("ирина");
+//             checkSpam('rhjkbf'))
+//            console.log(checkSpam('buy ViAgRA now'))
+//            console.log(truncate('привет мир', 20));
+//              promt100();
+//              weirdNubmer(100);
+//              switchBlade();
+              switchBladeIf();
+        }
+    </script>
+</head>
+<body id="mainflow">
+
+<header id="header"><div>header</div><div>header</div></header>
+
+<section  class="section" >
+    <!--Напишите функцию checkSpam(str), которая возвращает true, если строка str содержит ‘viagra’ or ‘XXX’.-->
+
+    <!--Функция должна быть нечувствительна к регистру:-->
+    <!--checkSpam('buy ViAgRA now') == true-->
+    <!--checkSpam('free xxxxx') == true-->
+    <!--checkSpam("innocent rabbit") == false-->
+    <!--<br>-->
+    <!--<br>-->
+    <!--<br>-->
+    <!--Создайте функцию truncate(str, maxlength), которая проверяет длину строки str, и если она превосходит maxlength — заменяет конец str на '…', так чтобы ее длина стала равна maxlength.-->
+
+    <!--Результатом функции должна быть (при необходимости) усечённая строка.-->
+
+    <!--Например:-->
+    <!--truncate("Вот, что мне хотелось бы сказать на эту тему:", 20)) = "Вот, что мне хотело…"-->
+
+    <!--truncate("Всем привет!", 20)) = "Всем привет!"-->
+    <!--Эта функция имеет применение в жизни. Она используется, чтобы усекать слишком длинные темы сообщений.-->
+    <!--<br>-->
+    <!--<br>-->
+    <!--<br>-->
+    <!--Напишите цикл, который предлагает prompt ввести число, большее 100. Если посетитель ввел другое число — попросить ввести еще раз, и так далее.-->
+
+    <!--Цикл должен спрашивать число пока либо посетитель не введет число, большее 100, либо не нажмет кнопку Cancel (ESC).-->
+
+    <!--Предполагается, что посетитель вводит только числа.-->
+    <!--<br>-->
+    <br>
+    <br>
+    Натуральное число, большее 1, называется простым, если оно ни на что не делится, кроме себя и 1.
+
+    Другими словами, n>1 - простое, если при делении на любое число от 2 до n-1 есть остаток.
+
+    Создайте код, который выводит все простые числа из интервала от 2 до 10. Результат должен быть: 2,3,5,7.
+
+    P.S. Код также должен легко модифицироваться для любых других интервалов.
+</section>
+
+<aside id="log" class="log_fixed">log:</aside>
+
+<footer>footer</footer>
+
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', lesson, false);
+</script>
+</body>
+</html>

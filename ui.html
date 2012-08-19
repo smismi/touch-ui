@@ -16,6 +16,7 @@
                 new UI(
                     document.getElementById('scroll'),
                     {
+                        disabler: "check_enabled"
                     });
             })();
         }
@@ -24,7 +25,7 @@
 <body id="mainflow">
 
     <header id="header"><div>header</div><div>header</div></header>
-
+    <input type="checkbox" id="check_enabled">
 
     <div id="scroll">
         <ul>

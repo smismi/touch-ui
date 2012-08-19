@@ -14,10 +14,30 @@
         var _this = this;
         _this.wrapper = el;
         _this.scroller = el.children[0];
+        // Default options
+        _this.options = {
+            enabled: true
+        };
+        // User defined options
+        for (i in options) _this.options[i] = options[i];
+        _this.disabler = document.getElementById(_this.options.disabler);
+
+        _this.disabler.addEventListener ("click", function (event) {
+            var target = event.target;
+            if (target.checked) {
+                _this.wrapper.style.opacity = 0.5;
+                _this.options.enabled = false;
+            } else {
+                _this.wrapper.style.opacity = 1;
+                _this.options.enabled = true;
+
+            }
+            alert ("Returns \"" + target.nodeName + target.checked +  "\". Just want \"" + target.parentNode.nodeName + "\"")
+        }, false);
+
 
         _this._drawScroll(el);
         _this._bindMouseScroll(el);
-
     };
 // Prototype
     UI.prototype = {
@@ -43,8 +63,12 @@
         var scrollhandlerHeight = _this.wrapperHeight * _this.wrapperHeight / _this.scrollerHeight;
         _this.scrollbar.style.height = scrollhandlerHeight + 'px';
 
+//        _this.scrollbar._bindMouseClick(el);
+        _this._bindMouseClick(_this.scrollbar);
+
     },
     _move: function (deltaY) {
+
         var _this = this;
         _this.y += deltaY/4;
         _this.scroller.style.position = 'absolute';
@@ -125,6 +149,8 @@
 
 
             function onMouseWheel(e) {
+
+                if (!_this.options.enabled) return;
                 e = e || event;
                 if (!e.wheelDelta) {
                     e.wheelDelta = -40*e.detail; // для Firefox
@@ -144,6 +170,32 @@
                 // отменить действие по умолчанию (прокрутку элемента/страницы)
                 e.preventDefault ? e.preventDefault() : (e.returnValue = false);
             }
+        },
+        _bindMouseClick: function(elem) {
+            var _this = this;
+//            if (elem.addEventListener) {
+//                // IE9+, Opera, Chrome/Safari (можно onmousehweel = ...)
+//                elem.addEventListener ("click", startDragDrop, false);
+//                // Firefox (нельзя onDOMMouseScroll = ..., только addEventListener)
+//                elem.addEventListener ("click", startDragDrop, false);
+//            } else { // IE<9
+//                elem.attachEvent ("click", startDragDrop);
+//            }
+            alert(elem);
+
+            function startDragDrop(e) {
+                e = e || event;
+                if (!e.wheelDelta) {
+                    e.wheelDelta = -40*e.detail; // для Firefox
+                }
+                alert('кликнуто');
+                // отменить действие по умолчанию (прокрутку элемента/страницы)
+                e.preventDefault ? e.preventDefault() : (e.returnValue = false);
+            }
+        },
+        _bindCheck: function(elem) {
+            var _this = this;
+
         },
         _getCoords: function(elem) {
             var box = elem.getBoundingClientRect();
