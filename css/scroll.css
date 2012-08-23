@@ -5,3 +5,52 @@
     font-size: 12px;
     overflow: hidden;
 }
+
+
+body,ul,li {
+    padding:0;
+    margin:0;
+    border:0;
+}
+
+body {
+    font-size:44px;
+    /*-webkit-user-select:none;*/
+    /*-webkit-text-size-adjust:none;*/
+    font-family:helvetica;
+}
+
+.log_fixed {
+    position: fixed;
+    /*height: 100%;*/
+    right:0;
+    top:0;
+    bottom:0;
+    width: 100px;
+    font-size: 10px;
+    background: #000;
+    color: #3dff18;
+    overflow: auto;
+}
+
+.section {
+    width: 300px;
+    position: relative;
+}
+#header {
+    position: relative;
+}
+.scrollwrapper {
+    position: relative;
+    overflow: hidden;
+}
+.scrollbar {
+    position: absolute;
+    right:0;
+    top:0;
+    height:100%;
+    background: #888;
+    width: 5px;
+    border-radius: 2px;
+    opacity: 0.8;
+}

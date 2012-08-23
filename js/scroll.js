@@ -33,7 +33,6 @@ function $px(x) {
         // User defined options
         for (i in options) that.options[i] = options[i];
 
-
         that.drawScroller(that.scroller);
         that.activateDisabler();
     },
@@ -58,7 +57,19 @@ function $px(x) {
             that.wrapper.appendChild(that.scrollbar);
             el.parentNode.replaceChild(that.wrapper, el);
 
+
+
+
+            that.getDim(that.scroller);
+            that.scrollbar.style.height = $px(that.options.dimentions.height * that.options.dimentions.height / that.height);
             that.bindMouseScroll(that.scroller);
+        },
+        getDim : function(el) {
+            var that = this;
+
+            that.width = el.clientWidth;
+            that.height = el.clientHeight;
+            that._log(that.width + " " + that.height)
         },
         activateDisabler:function () {
             var that = this;
@@ -76,13 +87,12 @@ function $px(x) {
 
 
         },
-        _move:function (deltaY, el) {
-
+        _move:function (deltaY) {
             var that = this;
-            console.log(el);
             that.options.position.y += deltaY / 4;
             that.scroller.style.position = 'absolute';
-            that.scroller.style.top = that.options.position.y + 'px';
+            that.scroller.style.top = $px(that.options.position.y);
+            that.scrollbar.style.top = $px(that.options.position.y * that.options.dimentions.height / -that.height);
 
 //            that.scrollbar.style.top = -that.options.position.y * that.wrapperHeight / that.scrollerHeight + 'px';
 
@@ -106,16 +116,16 @@ function $px(x) {
                 if (!e.wheelDelta) {
                     e.wheelDelta = -40 * e.detail; // для Firefox
                 }
-//                if (that.options.position.y < 0 && e.wheelDelta > 0) {
-
+                if (e.wheelDelta < 0) {
+                    if (that.options.position.y < -(that.height - that.options.dimentions.height)) return;
                     that._move(e.wheelDelta, el);
-//                }
-
-//                if ((Math.abs(that.options.position.y) < (that.scrollerHeight - that.wrapperHeight)) && e.wheelDelta < 0) {
+                }
+                if (e.wheelDelta > 0) {
+                    if (that.options.position.y >= 0) return;
                     that._move(e.wheelDelta, el);
-//                }
+                }
 
-                that._log(e.wheelDelta);
+                that._log(that.options.position.y);
                 // отменить действие по умолчанию (прокрутку элемента/страницы)
                 e.preventDefault ? e.preventDefault() : (e.returnValue = false);
             }
