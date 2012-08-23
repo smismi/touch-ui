@@ -23,6 +23,9 @@ function $px(x) {
     var isTouch = 'ontouchstart' in window && !isTouchPad;
 
     var START_EV = isTouch ? 'touchstart' : 'mousedown';
+    var CANCEL_EV = isTouch ? 'touchcancel' : 'mouseup';
+    var MOVE_EV = isTouch ? 'touchmove' : 'mousemove';
+    var END_EV = isTouch ? 'touchend' : 'mouseup';
 
     Scroll = function(el, options) {
         var that = this;
@@ -44,6 +47,9 @@ function $px(x) {
         that.drawScroller(that.scroller);
         that.activateDisabler();
         that._bind(START_EV, that.scroller);
+        that._bind(MOVE_EV, that.scroller);
+        that._bind(END_EV, that.scroller);
+        that._bind(CANCEL_EV, that.scroller);
 //        if (isTouch) {
 //            that.bindTouch(that.scroller);
 //        }
@@ -53,13 +59,13 @@ function $px(x) {
 //    touch
         handleEvent: function (e) {
                 var that = this;
+                that._log(e.type)
                 switch(e.type) {
                 case START_EV:
-                    alert(1);
-                    if (!hasTouch && e.button !== 0) return;
+                    if (!isTouch && e.button !== 0) return;
                     that._start(e);
                     break;
-                case MOVE_EV: that._move(e); break;
+                case MOVE_EV: that._move0(e); break;
                 case END_EV:
                 case CANCEL_EV: that._end(e); break;
                 case RESIZE_EV: that._resize(); break;
@@ -67,12 +73,25 @@ function $px(x) {
                 case 'webkitTransitionEnd': that._transitionEnd(e); break;
             }
         },
-//        bindTouch: function(el) {
-//            var that = this;
-//            elem = that.wrapper;
-//            elem.addEventListener((isTouch ? "touchstart" : "mousedown"), that.onTouchStart, false);
-//
-//        },
+        _start: function(e) {
+            var that = this;
+            var point = isTouch ? e.touches[0] : e;
+
+            that._log('_start');
+
+        },
+        _move0: function(e) {
+            var that = this;
+            var point = isTouch ? e.touches[0] : e;
+
+            that._log('_move');
+        },
+        _end: function(e) {
+            var that = this;
+            var point = isTouch ? e.touches[0] : e;
+
+            that._log('_stop');
+        },
 //        onTouchStart:function (e) {
 //            var that = this;
 //
@@ -107,7 +126,8 @@ function $px(x) {
 
             that.getDim(that.scroller);
             that.scrollbar.style.height = $px(that.options.dimentions.height * that.options.dimentions.height / that.height);
-            that.bindMouseScroll(that.scroller);
+            that.bindMouseScroll();
+            that.scroller.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
         },
         getDim : function(el) {
             var that = this;
