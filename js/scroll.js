@@ -30,6 +30,7 @@ function $px(x) {
     Scroll = function(el, options) {
         var that = this;
         that.scroller = $(el);
+        that.started = false;
         that.options = {
             enabled:true,
             dimentions: {
@@ -59,7 +60,7 @@ function $px(x) {
 //    touch
         handleEvent: function (e) {
                 var that = this;
-                that._log(e.type)
+//                that._log(e.type)
                 switch(e.type) {
                 case START_EV:
                     if (!isTouch && e.button !== 0) return;
@@ -76,12 +77,13 @@ function $px(x) {
         _start: function(e) {
             var that = this;
             var point = isTouch ? e.touches[0] : e;
-
+            that.started = true;
             that._log('_start');
 
         },
         _move0: function(e) {
             var that = this;
+            if (!that.started) return;
             var point = isTouch ? e.touches[0] : e;
 
             that._log('_move');
@@ -89,7 +91,7 @@ function $px(x) {
         _end: function(e) {
             var that = this;
             var point = isTouch ? e.touches[0] : e;
-
+            that.started = false;
             that._log('_stop');
         },
 //        onTouchStart:function (e) {
