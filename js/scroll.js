@@ -47,10 +47,7 @@ function $px(x) {
 
         that.drawScroller(that.scroller);
         that.activateDisabler();
-        that._bind(START_EV, that.scroller);
-        that._bind(MOVE_EV, that.scroller);
-        that._bind(END_EV, that.scroller);
-        that._bind(CANCEL_EV, that.scroller);
+
 //        if (isTouch) {
 //            that.bindTouch(that.scroller);
 //        }
@@ -78,6 +75,10 @@ function $px(x) {
             var that = this;
             var point = isTouch ? e.touches[0] : e;
             that.started = true;
+            that.startX = that.x;
+            that.startY = that.y;
+            that.pointX = point.pageX;
+            that.pointY = point.pageY;
             that._log('_start');
 
         },
@@ -85,8 +86,14 @@ function $px(x) {
             var that = this;
             if (!that.started) return;
             var point = isTouch ? e.touches[0] : e;
+                deltaX = point.pageX - that.pointX;
+                deltaY = point.pageY - that.pointY;
+                newX = that.x + deltaX;
+                newY = that.y + deltaY;
+                timestamp = e.timeStamp || Date.now();
+            that._log('_move'+ deltaY);
+            that._move(deltaY);
 
-            that._log('_move');
         },
         _end: function(e) {
             var that = this;
@@ -129,7 +136,12 @@ function $px(x) {
             that.getDim(that.scroller);
             that.scrollbar.style.height = $px(that.options.dimentions.height * that.options.dimentions.height / that.height);
             that.bindMouseScroll();
-            that.scroller.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+
+            that._bind(START_EV, that.wrapper);
+            that._bind(MOVE_EV, that.wrapper);
+            that._bind(END_EV, that.wrapper);
+            that._bind(CANCEL_EV, that.wrapper);
+            that.wrapper.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
         },
         getDim : function(el) {
             var that = this;
