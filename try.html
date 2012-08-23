@@ -110,6 +110,57 @@
 
             alert(err);
         }
+        function numbers1() {
+
+            var a = prompt('first number?', '');
+            var b = prompt('second number?', '');
+            summ = a - 0 + b - 0;
+            alert(summ);
+        }
+        function fibon() {
+            function fib(n){
+                var a=1, b=0, x;
+                for(i=0; i<n; i++) {
+                    x = a+b;
+                    a = b
+                    b = x;
+                }
+                return b;
+            }
+            function fib2(n){
+                fi=(1+Math.sqrt(5))/2
+
+                b = Math.pow(fi, n) / Math.sqrt(5)
+                return b;
+            }
+
+            console.log(fib(77));
+
+            console.log(Math.round(fib2(77)));
+
+
+        }
+        function max(n, m) {
+
+
+            x = Math.random()* n
+            console.log(x);
+
+
+        }
+        function pow() {
+            x = prompt("x");
+            n = prompt("n");
+//            if (n)
+            var result = x;
+
+            for (i = 0; i<=n; i++) {
+                result *= x
+            }
+            return result
+
+
+        }
 
         function lesson() {
 //            doFirstCharUpper("ирина");
@@ -119,7 +170,11 @@
 //              promt100();
 //              weirdNubmer(100);
 //              switchBlade();
-              switchBladeIf();
+//              switchBladeIf();
+//              numbers1();
+//              fibon();
+//              max(4);
+            console.log(pow())
         }
     </script>
 </head>
