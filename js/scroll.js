@@ -33,17 +33,19 @@ function $px(x) {
         that.started = false;
         that.options = {
             enabled:true,
-            dimentions: {
-                width: 0,
-                height: 0
-            },
-            position: {
-                x: 0,
-                y: 0
-            }
+            w: 0,
+            h: 0,
+            x: 0,
+            y: 0
         };
+
         // User defined options
         for (i in options) that.options[i] = options[i];
+        // Set starting position
+        that.x = that.options.x;
+        that.y = that.options.y;
+        that.w = that.options.w;
+        that.h = that.options.h;
 
         that.drawScroller(that.scroller);
         that.activateDisabler();
@@ -62,6 +64,7 @@ function $px(x) {
                 case START_EV:
                     if (!isTouch && e.button !== 0) return;
                     that._start(e);
+                    e.stopPropagation();
                     break;
                 case MOVE_EV: that._move0(e); break;
                 case END_EV:
@@ -79,20 +82,24 @@ function $px(x) {
             that.startY = that.y;
             that.pointX = point.pageX;
             that.pointY = point.pageY;
-            that._log('_start');
+            that._log('_start' + that.pointX + ' ' + that.pointY);
 
         },
         _move0: function(e) {
             var that = this;
             if (!that.started) return;
             var point = isTouch ? e.touches[0] : e;
-                deltaX = point.pageX - that.pointX;
-                deltaY = point.pageY - that.pointY;
-                newX = that.x + deltaX;
-                newY = that.y + deltaY;
-                timestamp = e.timeStamp || Date.now();
-            that._log('_move'+ deltaY);
-            that._move(deltaY);
+                deltaX = that.startX + point.pageX - that.pointX;
+                deltaY = that.startY + point.pageY - that.pointY;
+
+            that.x = deltaX;
+            that.y = deltaY;
+            that.scroller.style.position = 'absolute';
+            that.scroller.style.left = $px(that.x);
+            that.scroller.style.top = $px(that.y);
+            that.scrollbar.style.top = $px(that.y * that.h / -that.h);
+
+
 
         },
         _end: function(e) {
@@ -122,8 +129,8 @@ function $px(x) {
             that._addClass(that.scroller, 'scroller');
 
 
-            that.wrapper.style.width = $px(that.options.dimentions.width);
-            that.wrapper.style.height = $px(that.options.dimentions.height);
+            that.wrapper.style.width = $px(that.w);
+            that.wrapper.style.height = $px(that.h);
             that.wrapper.style.position = "relative";
             that.scroller = el.cloneNode(true);
             that.wrapper.appendChild(that.scroller);
@@ -134,14 +141,14 @@ function $px(x) {
 
 
             that.getDim(that.scroller);
-            that.scrollbar.style.height = $px(that.options.dimentions.height * that.options.dimentions.height / that.height);
+            that.scrollbar.style.height = $px(that.h * that.h / that.height);
             that.bindMouseScroll();
 
-            that._bind(START_EV, that.wrapper);
-            that._bind(MOVE_EV, that.wrapper);
-            that._bind(END_EV, that.wrapper);
-            that._bind(CANCEL_EV, that.wrapper);
-            that.wrapper.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+                that._bind(START_EV, that.wrapper);
+                that._bind(MOVE_EV, that.wrapper);
+                that._bind(END_EV, that.wrapper);
+                that._bind(CANCEL_EV, that.wrapper);
+                that.wrapper.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
         },
         getDim : function(el) {
             var that = this;
@@ -168,11 +175,11 @@ function $px(x) {
         },
         _move:function (deltaY) {
             var that = this;
-            that.options.position.y += deltaY / 4;
+            that.y += deltaY / 4;
             that.scroller.style.position = 'absolute';
-            that.scroller.style.top = $px(that.options.position.y);
-            that.scrollbar.style.top = $px(that.options.position.y * that.options.dimentions.height / -that.height);
-
+            that.scroller.style.top = $px(that.y);
+            that.scrollbar.style.top = $px(that.y * that.h / -that.height);
+            that._log(that.y);
 //            that.scrollbar.style.top = -that.options.position.y * that.wrapperHeight / that.scrollerHeight + 'px';
 
 //            that._fadeInScroll();
@@ -196,16 +203,17 @@ function $px(x) {
                     e.wheelDelta = -40 * e.detail; // для Firefox
                 }
                 if (e.wheelDelta < 0) {
-                    if (that.options.position.y < -(that.height - that.options.dimentions.height)) return;
+                    if (that.y < -(that.height - that.h)) return;
                     that._move(e.wheelDelta, el);
                 }
                 if (e.wheelDelta > 0) {
-                    if (that.options.position.y >= 0) return;
+                    if (that.y >= 0) return;
                     that._move(e.wheelDelta, el);
                 }
 
-                that._log(that.options.position.y);
+                that._log(that.y);
                 // отменить действие по умолчанию (прокрутку элемента/страницы)
+                e.stopPropagation();
                 e.preventDefault ? e.preventDefault() : (e.returnValue = false);
             }
 
