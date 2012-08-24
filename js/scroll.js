@@ -14,7 +14,6 @@ function $px(x) {
 }
 
 (function () {
-
     //touch extention
     var isAndroid = (/android/gi).test(navigator.appVersion);
     var isIDevice = (/iphone|ipad/gi).test(navigator.appVersion);
@@ -23,6 +22,7 @@ function $px(x) {
     var isTouch = 'ontouchstart' in window && !isTouchPad;
 
     var START_EV = isTouch ? 'touchstart' : 'mousedown';
+    var SCROLL_EV = 'mousewheel';
     var CANCEL_EV = isTouch ? 'touchcancel' : 'mouseup';
     var MOVE_EV = isTouch ? 'touchmove' : 'mousemove';
     var END_EV = isTouch ? 'touchend' : 'mouseup';
@@ -36,18 +36,21 @@ function $px(x) {
             w: 0,
             h: 0,
             x: 0,
-            y: 0
+            y: 0,
+            hScroll: false,
+            vScroll: true
         };
 
         // User defined options
         for (i in options) that.options[i] = options[i];
+
         // Set starting position
         that.x = that.options.x;
         that.y = that.options.y;
         that.w = that.options.w;
         that.h = that.options.h;
 
-        that.drawScroller(that.scroller);
+        that.prepareTo();
         that.activateDisabler();
 
 //        if (isTouch) {
@@ -56,14 +59,41 @@ function $px(x) {
     };
 
     Scroll.prototype = {
-//    touch
+        prepareTo: function () {
+            that = this;
+            that.drawScroller(that.scroller);
+
+
+
+
+
+            that._bind(SCROLL_EV, that.wrapper);
+            that._bind(START_EV, that.wrapper);
+            that._bind(MOVE_EV, that.wrapper);
+            that._bind(END_EV, that.wrapper);
+            that._bind(CANCEL_EV, that.wrapper);
+
+
+            that.wrapper.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+
+        },
+
+
+
+
+//    action
         handleEvent: function (e) {
                 var that = this;
-//                that._log(e.type)
+                that._log(e.type)
                 switch(e.type) {
+                case SCROLL_EV:
+                    that.scroll(e);
+                    e.stopPropagation();
+                    break;
+
                 case START_EV:
                     if (!isTouch && e.button !== 0) return;
-                    that._start(e);
+                    that.start(e);
                     e.stopPropagation();
                     break;
                 case MOVE_EV: that._move0(e); break;
@@ -74,7 +104,27 @@ function $px(x) {
                 case 'webkitTransitionEnd': that._transitionEnd(e); break;
             }
         },
-        _start: function(e) {
+        scroll: function(e) {
+            var that = this;
+            if (!that.options.enabled) return;
+            e = e || event;
+            if (!e.wheelDelta) {
+                e.wheelDelta = -40 * e.detail; // для Firefox
+            }
+            if (e.wheelDelta < 0) {
+                if (that.y < -(that.height - that.h)) return;
+                that._move(e.wheelDelta, that.scroller);
+            }
+            if (e.wheelDelta > 0) {
+                if (that.y >= 0) return;
+                that._move(e.wheelDelta, that.scroller);
+            }
+            // отменить действие по умолчанию (прокрутку элемента/страницы)
+            e.stopPropagation();
+            e.preventDefault ? e.preventDefault() : (e.returnValue = false);
+
+        },
+        start: function(e) {
             var that = this;
             var point = isTouch ? e.touches[0] : e;
             that.started = true;
@@ -91,14 +141,12 @@ function $px(x) {
             var point = isTouch ? e.touches[0] : e;
                 deltaX = that.startX + point.pageX - that.pointX;
                 deltaY = that.startY + point.pageY - that.pointY;
-
             that.x = deltaX;
             that.y = deltaY;
-            that.scroller.style.position = 'absolute';
-            that.scroller.style.left = $px(that.x);
-            that.scroller.style.top = $px(that.y);
-            that.scrollbar.style.top = $px(that.y * that.h / -that.h);
 
+            timestamp = e.timeStamp || Date.now();
+            that._log('_move'+ deltaY);
+            that._move(deltaY);
 
 
         },
@@ -108,17 +156,20 @@ function $px(x) {
             that.started = false;
             that._log('_stop');
         },
-//        onTouchStart:function (e) {
-//            var that = this;
-//
-//            if (!that.options.enabled) return;
-////                point = e.touches[0];
-//            point = isTouch ? e.touches[0] : e;
-//            that._log(point.clientX);
-//            that._log(point.clientY);
-//            // отменить действие по умолчанию (прокрутку элемента/страницы)
-//            e.preventDefault ? e.preventDefault() : (e.returnValue = false);
-//        },
+
+        _move:function (delta) {
+            var that = this;
+            if (that.options.hScroll) that.x += delta / 4;
+            if (that.options.vScroll) that.y += delta / 4;
+            that.scroller.style.position = 'absolute';
+            that.scroller.style.top = $px(that.y);
+            that.scroller.style.left = $px(that.x);
+            that.scrollbar.style.top = $px(that.y * that.h / -that.height);
+            that._log(that.y);
+
+
+        },
+
 //    utils
         drawScroller : function(el) {
             var that = this;
@@ -142,13 +193,9 @@ function $px(x) {
 
             that.getDim(that.scroller);
             that.scrollbar.style.height = $px(that.h * that.h / that.height);
-            that.bindMouseScroll();
+            //that.bindMouseScroll();
 
-                that._bind(START_EV, that.wrapper);
-                that._bind(MOVE_EV, that.wrapper);
-                that._bind(END_EV, that.wrapper);
-                that._bind(CANCEL_EV, that.wrapper);
-                that.wrapper.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+
         },
         getDim : function(el) {
             var that = this;
@@ -173,52 +220,6 @@ function $px(x) {
 
 
         },
-        _move:function (deltaY) {
-            var that = this;
-            that.y += deltaY / 4;
-            that.scroller.style.position = 'absolute';
-            that.scroller.style.top = $px(that.y);
-            that.scrollbar.style.top = $px(that.y * that.h / -that.height);
-            that._log(that.y);
-//            that.scrollbar.style.top = -that.options.position.y * that.wrapperHeight / that.scrollerHeight + 'px';
-
-//            that._fadeInScroll();
-
-        },
-        bindMouseScroll:function (el) {
-            var that = this;
-            elem = that.wrapper;
-            if (elem.addEventListener) {
-                // IE9+, Opera, Chrome/Safari (можно onmousehweel = ...)
-                elem.addEventListener("mousewheel", onMouseWheel, false);
-                // Firefox (нельзя onDOMMouseScroll = ..., только addEventListener)
-                elem.addEventListener("DOMMouseScroll", onMouseWheel, false);
-            } else { // IE<9
-                elem.attachEvent("onmousewheel", onMouseWheel);
-            }
-            function onMouseWheel(e) {
-                if (!that.options.enabled) return;
-                e = e || event;
-                if (!e.wheelDelta) {
-                    e.wheelDelta = -40 * e.detail; // для Firefox
-                }
-                if (e.wheelDelta < 0) {
-                    if (that.y < -(that.height - that.h)) return;
-                    that._move(e.wheelDelta, el);
-                }
-                if (e.wheelDelta > 0) {
-                    if (that.y >= 0) return;
-                    that._move(e.wheelDelta, el);
-                }
-
-                that._log(that.y);
-                // отменить действие по умолчанию (прокрутку элемента/страницы)
-                e.stopPropagation();
-                e.preventDefault ? e.preventDefault() : (e.returnValue = false);
-            }
-
-
-        },
         _addClass:function (elem, clazz) {
             var c = elem.className.split(' ');
             for (var i = 0; i < c.length; i++) {
@@ -234,7 +235,12 @@ function $px(x) {
             document.getElementById("log").appendChild(logs);
         },
         _bind: function (type, el, bubble) {
-            el.addEventListener(type, this, !!bubble);
+            if (el.addEventListener) {
+                // IE9+, Opera, Chrome/Safari (можно onmousehweel = ...)
+                el.addEventListener(type, this, !!bubble);
+            } else { // IE<9
+                el.attachEvent(type, !!bubble);
+            }
         },
 
         _unbind: function (type, el, bubble) {
