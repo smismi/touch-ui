@@ -14,6 +14,8 @@ function $px(x) {
 }
 
 (function () {
+    var m = Math;
+    var mround = function (r) { return r >> 0; };
     //touch extention
     var isAndroid = (/android/gi).test(navigator.appVersion);
     var isIDevice = (/iphone|ipad/gi).test(navigator.appVersion);
@@ -84,7 +86,6 @@ function $px(x) {
 //    action
         handleEvent: function (e) {
                 var that = this;
-                that._log(e.type)
                 switch(e.type) {
                 case SCROLL_EV:
                     that.scroll(e);
@@ -96,7 +97,7 @@ function $px(x) {
                     that.start(e);
                     e.stopPropagation();
                     break;
-                case MOVE_EV: that._move0(e); break;
+                case MOVE_EV: that._move(e); break;
                 case END_EV:
                 case CANCEL_EV: that._end(e); break;
                 case RESIZE_EV: that._resize(); break;
@@ -108,17 +109,10 @@ function $px(x) {
             var that = this;
             if (!that.options.enabled) return;
             e = e || event;
-            if (!e.wheelDelta) {
-                e.wheelDelta = -40 * e.detail; // для Firefox
-            }
-            if (e.wheelDelta < 0) {
-                if (that.y < -(that.height - that.h)) return;
-                that._move(e.wheelDelta, that.scroller);
-            }
-            if (e.wheelDelta > 0) {
-                if (that.y >= 0) return;
-                that._move(e.wheelDelta, that.scroller);
-            }
+
+
+                that._move(e);
+
             // отменить действие по умолчанию (прокрутку элемента/страницы)
             e.stopPropagation();
             e.preventDefault ? e.preventDefault() : (e.returnValue = false);
@@ -126,13 +120,35 @@ function $px(x) {
         },
         start: function(e) {
             var that = this;
+            if (!that.options.enabled) return;
             var point = isTouch ? e.touches[0] : e;
             that.started = true;
+//            that.startX = that.x;
+//            that.startY = that.y;
+//            that.pointX = point.pageX;
+//            that.pointY = point.pageY;
+//            that._log('_start' + that.pointX + ' ' + that.pointY);
+
+
+
+            that.moved = false;
+            that.animating = false;
+            that.zoomed = false;
+            that.distX = 0;
+            that.distY = 0;
+            that.absDistX = 0;
+            that.absDistY = 0;
+            that.dirX = 0;
+            that.dirY = 0;
+
             that.startX = that.x;
             that.startY = that.y;
             that.pointX = point.pageX;
             that.pointY = point.pageY;
-            that._log('_start' + that.pointX + ' ' + that.pointY);
+
+            that.startTime = e.timeStamp || Date.now();
+
+            if (that.options.onScrollStart) that.options.onScrollStart.call(that, e);
 
         },
         _move0: function(e) {
@@ -157,20 +173,106 @@ function $px(x) {
             that._log('_stop');
         },
 
-        _move:function (delta) {
+        _move:function (e) {
+//            var that = this; that._log(that.y);
+//            if (that.y < -(that.height - that.h)) {
+//                that.y = -(that.height - that.h);
+//                that.scroller.style.top = $px(that.y);
+//                that.scroller.style.left = $px(that.x);
+//                that.scrollbar.style.top = $px(that.y * that.h / -that.height);
+//                return;
+//            }
+//            if (that.y > 0) {
+//                that.y = 0;
+//                that.scroller.style.top = $px(that.y);
+//                that.scroller.style.left = $px(that.x);
+//                that.scrollbar.style.top = $px(that.y * that.h / -that.height);
+//                return;
+//            }
+//            if (that.options.hScroll) that.x += delta / 4;
+//            if (that.options.vScroll) that.y += delta / 4;
+//            that.scroller.style.position = 'absolute';
+//            that.scroller.style.top = $px(that.y);
+//            that.scroller.style.left = $px(that.x);
+//            that.scrollbar.style.top = $px(that.y * that.h / -that.height);
             var that = this;
-            if (that.options.hScroll) that.x += delta / 4;
-            if (that.options.vScroll) that.y += delta / 4;
-            that.scroller.style.position = 'absolute';
-            that.scroller.style.top = $px(that.y);
-            that.scroller.style.left = $px(that.x);
-            that.scrollbar.style.top = $px(that.y * that.h / -that.height);
-            that._log(that.y);
+            var point = isTouch ? e.touches[0] : e;
+            var deltaX = point.pageX - that.pointX;
+            var deltaY = point.pageY - that.pointY;
+            var newX = that.x + deltaX;
+            var newY = that.y + deltaY;
+            var timestamp = e.timeStamp || Date.now();
+            if (!e.wheelDelta) {
+                e.wheelDelta = -40 * e.detail; // для Firefox
+            }
+            if (that.options.onBeforeScrollMove) that.options.onBeforeScrollMove.call(that, e);
+
+            if (!that.started) return;
+            that.pointX = point.pageX;
+            that.pointY = point.pageY;
+
+            // Slow down if outside of the boundaries
+            if (newX > 0 || newX < that.maxScrollX) {
+                newX = that.options.bounce ? that.x + (deltaX / 2) : newX >= 0 || that.maxScrollX >= 0 ? 0 : that.maxScrollX;
+            }
+            if (newY > 0 || newY < that.maxScrollY) {
+                newY = that.options.bounce ? that.y + (deltaY / 2) : newY >= 0 || that.maxScrollY >= 0 ? 0 : that.maxScrollY;
+            }
+            that.distX += deltaX;
+            that.distY += deltaY;
+            that.absDistX = m.abs(that.distX);
+            that.absDistY = m.abs(that.distY);
+
+            if (that.absDistX < 6 && that.absDistY < 6) {
+                return;
+            }
+
+            // Lock direction
+            if (that.options.lockDirection) {
+                if (that.absDistX > that.absDistY + 5) {
+                    newY = that.y;
+                    deltaY = 0;
+                } else if (that.absDistY > that.absDistX + 5) {
+                    newX = that.x;
+                    deltaX = 0;
+                }
+            }
+
+            that.moved = true;
+            that._pos(newX, newY);
+            that.dirX = deltaX > 0 ? -1 : deltaX < 0 ? 1 : 0;
+            that.dirY = deltaY > 0 ? -1 : deltaY < 0 ? 1 : 0;
+
+            if (timestamp - that.startTime > 300) {
+                that.startTime = timestamp;
+                that.startX = that.x;
+                that.startY = that.y;
+            }
+
+            if (that.options.onScrollMove) that.options.onScrollMove.call(that, e);
 
 
         },
 
 //    utils
+        _pos: function (x, y) {
+            x = this.options.hScroll ? x : 0;
+            y = this.options.vScroll ? y : 0;
+
+            this.scroller.style.position = 'absolute';
+            if (this.options.useTransform) {
+                this.scroller.style[vendor + 'Transform'] = trnOpen + x + 'px,' + y + 'px' + trnClose + ' scale(' + this.scale + ')';
+            } else {
+                x = mround(x);
+                y = mround(y);
+                this.scroller.style.left = x + 'px';
+                this.scroller.style.top = y + 'px';
+            }
+
+            that._log(this.x +' ' + this.y);
+            this.x = x;
+            this.y = y;
+        },
         drawScroller : function(el) {
             var that = this;
             that.wrapper = document.createElement("div");
