@@ -109,9 +109,38 @@ function $px(x) {
             var that = this;
             if (!that.options.enabled) return;
             e = e || event;
-
-
-                that._move(e);
+            if (!e.wheelDelta) {
+                e.wheelDelta = -40 * e.detail; // для Firefox
+            }
+            if (e.wheelDelta < 0) {
+                if (that.y < -(that.height - that.h)) return;
+                delta = e.wheelDelta;
+            }
+            if (e.wheelDelta > 0) {
+                if (that.y >= 0) return;
+                delta = e.wheelDelta;
+            }
+            if (that.y < -(that.height - that.h)) {
+                that.y = -(that.height - that.h);
+                that.scroller.style.top = $px(that.y);
+                that.scroller.style.left = $px(that.x);
+                that.scrollbar.style.top = $px(that.y * that.h / -that.height);
+                return;
+            }
+            if (that.y > 0) {
+                that.y = 0;
+                that.scroller.style.top = $px(that.y);
+                that.scroller.style.left = $px(that.x);
+                that.scrollbar.style.top = $px(that.y * that.h / -that.height);
+                return;
+            }
+            if (that.options.hScroll) that.x += delta / 4;
+            if (that.options.vScroll) that.y += delta / 4;
+            that.scroller.style.position = 'absolute';
+            that.scroller.style.top = $px(that.y);
+            that.scroller.style.left = $px(that.x);
+            that.scrollbar.style.top = $px(that.y * that.h / -that.height);
+                //that._move(e);
 
             // отменить действие по умолчанию (прокрутку элемента/страницы)
             e.stopPropagation();
@@ -174,27 +203,7 @@ function $px(x) {
         },
 
         _move:function (e) {
-//            var that = this; that._log(that.y);
-//            if (that.y < -(that.height - that.h)) {
-//                that.y = -(that.height - that.h);
-//                that.scroller.style.top = $px(that.y);
-//                that.scroller.style.left = $px(that.x);
-//                that.scrollbar.style.top = $px(that.y * that.h / -that.height);
-//                return;
-//            }
-//            if (that.y > 0) {
-//                that.y = 0;
-//                that.scroller.style.top = $px(that.y);
-//                that.scroller.style.left = $px(that.x);
-//                that.scrollbar.style.top = $px(that.y * that.h / -that.height);
-//                return;
-//            }
-//            if (that.options.hScroll) that.x += delta / 4;
-//            if (that.options.vScroll) that.y += delta / 4;
-//            that.scroller.style.position = 'absolute';
-//            that.scroller.style.top = $px(that.y);
-//            that.scroller.style.left = $px(that.x);
-//            that.scrollbar.style.top = $px(that.y * that.h / -that.height);
+
             var that = this;
             var point = isTouch ? e.touches[0] : e;
             var deltaX = point.pageX - that.pointX;
