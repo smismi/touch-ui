@@ -43,13 +43,23 @@ body {
     position: relative;
     overflow: hidden;
 }
-.scrollbar {
+.scrollbarV {
     position: absolute;
     right:0;
     top:0;
     height:100%;
     background: #888;
     width: 5px;
+    border-radius: 2px;
+    opacity: 0.8;
+}
+.scrollbarH {
+    position: absolute;
+    left:0;
+    bottom:0;
+    width:100%;
+    background: #888;
+    height: 5px;
     border-radius: 2px;
     opacity: 0.8;
 }

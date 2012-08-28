@@ -39,7 +39,7 @@ function $px(x) {
             h: 0,
             x: 0,
             y: 0,
-            hScroll: false,
+            hScroll: true,
             vScroll: true
         };
 
@@ -51,6 +51,8 @@ function $px(x) {
         that.y = that.options.y;
         that.w = that.options.w;
         that.h = that.options.h;
+        that.vScroll = that.options.vScroll;
+        that.hScroll = that.options.hScroll;
 
         that.prepareTo();
         that.activateDisabler();
@@ -107,40 +109,36 @@ function $px(x) {
         },
         scroll: function(e) {
             var that = this;
+            var delta;
             if (!that.options.enabled) return;
             e = e || event;
             if (!e.wheelDelta) {
                 e.wheelDelta = -40 * e.detail; // для Firefox
             }
-            if (e.wheelDelta < 0) {
-                if (that.y < -(that.height - that.h)) return;
-                delta = e.wheelDelta;
+
+            delta = e.wheelDelta;
+
+
+            if (that.hScroll) deltaX = delta / 4;
+            if (that.vScroll) deltaY = delta / 4;
+
+            var newX = that.x + delta;
+            var newY = that.y + delta;
+            if (newY > 0) {
+                newY = 0;
             }
-            if (e.wheelDelta > 0) {
-                if (that.y >= 0) return;
-                delta = e.wheelDelta;
+            if (newY < - that.height + that.h) {
+                newY =  -that.height + that.h;
             }
-            if (that.y < -(that.height - that.h)) {
-                that.y = -(that.height - that.h);
-                that.scroller.style.top = $px(that.y);
-                that.scroller.style.left = $px(that.x);
-                that.scrollbar.style.top = $px(that.y * that.h / -that.height);
-                return;
+            if (newX > 0) {
+                newX = 0;
             }
-            if (that.y > 0) {
-                that.y = 0;
-                that.scroller.style.top = $px(that.y);
-                that.scroller.style.left = $px(that.x);
-                that.scrollbar.style.top = $px(that.y * that.h / -that.height);
-                return;
+            if (newX < - that.width + that.w) {
+                newX =  -that.width + that.w;
             }
-            if (that.options.hScroll) that.x += delta / 4;
-            if (that.options.vScroll) that.y += delta / 4;
-            that.scroller.style.position = 'absolute';
-            that.scroller.style.top = $px(that.y);
-            that.scroller.style.left = $px(that.x);
-            that.scrollbar.style.top = $px(that.y * that.h / -that.height);
-                //that._move(e);
+            that._pos(newX, newY);
+            that.scrollbarV.style.top = $px(that.y * that.h / -that.height);
+            that.scrollbarH.style.left = $px(that.x * that.w / -that.width);
 
             // отменить действие по умолчанию (прокрутку элемента/страницы)
             e.stopPropagation();
@@ -180,21 +178,6 @@ function $px(x) {
             if (that.options.onScrollStart) that.options.onScrollStart.call(that, e);
 
         },
-        _move0: function(e) {
-            var that = this;
-            if (!that.started) return;
-            var point = isTouch ? e.touches[0] : e;
-                deltaX = that.startX + point.pageX - that.pointX;
-                deltaY = that.startY + point.pageY - that.pointY;
-            that.x = deltaX;
-            that.y = deltaY;
-
-            timestamp = e.timeStamp || Date.now();
-            that._log('_move'+ deltaY);
-            that._move(deltaY);
-
-
-        },
         _end: function(e) {
             var that = this;
             var point = isTouch ? e.touches[0] : e;
@@ -203,7 +186,6 @@ function $px(x) {
         },
 
         _move:function (e) {
-
             var that = this;
             var point = isTouch ? e.touches[0] : e;
             var deltaX = point.pageX - that.pointX;
@@ -221,11 +203,19 @@ function $px(x) {
             that.pointY = point.pageY;
 
             // Slow down if outside of the boundaries
-            if (newX > 0 || newX < that.maxScrollX) {
-                newX = that.options.bounce ? that.x + (deltaX / 2) : newX >= 0 || that.maxScrollX >= 0 ? 0 : that.maxScrollX;
+            that._log(that.height + ' ' + that.h);
+
+            if (newY > 0) {
+                newY = 0;
             }
-            if (newY > 0 || newY < that.maxScrollY) {
-                newY = that.options.bounce ? that.y + (deltaY / 2) : newY >= 0 || that.maxScrollY >= 0 ? 0 : that.maxScrollY;
+            if (newY < - that.height + that.h) {
+                newY =  -that.height + that.h;
+            }
+            if (newX > 0) {
+                newX = 0;
+            }
+            if (newX < - that.width + that.w) {
+                newX =  -that.width + that.w;
             }
             that.distX += deltaX;
             that.distY += deltaY;
@@ -248,6 +238,10 @@ function $px(x) {
             }
 
             that.moved = true;
+
+            that.scrollbarV.style.top = $px(that.y * that.h / -that.height);
+            that.scrollbarH.style.left = $px(that.x * that.w / -that.width);
+
             that._pos(newX, newY);
             that.dirX = deltaX > 0 ? -1 : deltaX < 0 ? 1 : 0;
             that.dirY = deltaY > 0 ? -1 : deltaY < 0 ? 1 : 0;
@@ -265,48 +259,68 @@ function $px(x) {
 
 //    utils
         _pos: function (x, y) {
-            x = this.options.hScroll ? x : 0;
-            y = this.options.vScroll ? y : 0;
-
-            this.scroller.style.position = 'absolute';
+            var that = this;
+            x = that.hScroll ? x : 0;
+            y = that.vScroll ? y : 0;
             if (this.options.useTransform) {
                 this.scroller.style[vendor + 'Transform'] = trnOpen + x + 'px,' + y + 'px' + trnClose + ' scale(' + this.scale + ')';
             } else {
                 x = mround(x);
                 y = mround(y);
-                this.scroller.style.left = x + 'px';
-                this.scroller.style.top = y + 'px';
+                this.scroller.style.left = $px(x);
+                this.scroller.style.top = $px(y);
             }
 
-            that._log(this.x +' ' + this.y);
+            //that._log(this.x +' ' + this.y);
             this.x = x;
             this.y = y;
+            that.fadeInScroll();
         },
         drawScroller : function(el) {
             var that = this;
             that.wrapper = document.createElement("div");
-            that.scrollbar = document.createElement("div");
+
+
+            that.scroller = el.cloneNode(true);
+
+
+            that.scrollbarV = document.createElement("div");
+            that.scrollbarH = document.createElement("div");
             that._addClass(that.wrapper, 'wrapper');
-            that._addClass(that.scrollbar, 'scrollbar');
+            that._addClass(that.scrollbarV, 'scrollbarV');
+            that._addClass(that.scrollbarH, 'scrollbarH');
             that._addClass(that.scroller, 'scroller');
 
 
             that.wrapper.style.width = $px(that.w);
             that.wrapper.style.height = $px(that.h);
             that.wrapper.style.position = "relative";
-            that.scroller = el.cloneNode(true);
             that.wrapper.appendChild(that.scroller);
-            that.wrapper.appendChild(that.scrollbar);
+            that.wrapper.appendChild(that.scrollbarV);
+            that.wrapper.appendChild(that.scrollbarH);
+
             el.parentNode.replaceChild(that.wrapper, el);
-
-
-
+            this.scroller.style.position = "absolute";
 
             that.getDim(that.scroller);
-            that.scrollbar.style.height = $px(that.h * that.h / that.height);
-            //that.bindMouseScroll();
 
 
+            that.scrollbarV.style.height = $px(that.h * that.h / that.height);
+            that.scrollbarH.style.width = $px(that.w * that.w / that.width);
+            that.scrollbarV.style.opacity = .2;
+            that.scrollbarH.style.opacity = .2;
+
+            if (that.h > that.height) {
+                that.scrollbarV.style.display = "none";
+                that.vScroll = false;
+            }
+            if (that.w > that.width) {
+                that.scrollbarH.style.display = "none";
+                that.hScroll = false;
+            }
+            if (that.w < that.width && that.h < that.height && !isTouch) {
+                that.hScroll = false;
+            }
         },
         getDim : function(el) {
             var that = this;
@@ -330,6 +344,38 @@ function $px(x) {
             }, false);
 
 
+        },
+        fadeInScroll:function () {
+            var that = this;
+            that.scrollbarH.style.opacity = 1;
+            that.scrollbarV.style.opacity = 1;
+            clearTimeout(that.timerId);
+            clearTimeout(that.timerId2);
+            that.timerId = setTimeout(function () {
+
+                that.doAnimation(that.scrollbarH, 'opacity', .2);
+                that.doAnimation(that.scrollbarV, 'opacity', .2);
+//            _this.scrollbar.style.opacity = 0.2;
+            }, 700);
+
+        },
+        doAnimation:function (el, prop, threshold) {
+            var that = this;
+            var checkProp = function (cssProp) {
+                if (el.currentStyle)
+                    var y = el.currentStyle[cssProp];
+                else if (window.getComputedStyle)
+                    var y = document.defaultView.getComputedStyle(el, null).getPropertyValue(cssProp);
+                return y;
+            }
+            if (checkProp(prop)) {
+                function doMove() {
+                    el.style[prop] = (el.style[prop] > threshold) ? (el.style[prop] - 0.05) : threshold; // pseudo-property code
+                    that.timerId2 = setTimeout(doMove, 20); // call doMove() in 20 msec
+                }
+
+                doMove()
+            }
         },
         _addClass:function (elem, clazz) {
             var c = elem.className.split(' ');
