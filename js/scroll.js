@@ -116,6 +116,7 @@ function $px(x) {
                 e.wheelDelta = -40 * e.detail; // для Firefox
             }
 
+
             delta = e.wheelDelta;
 
 
