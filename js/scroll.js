@@ -150,14 +150,6 @@ function $px(x) {
             if (!that.options.enabled) return;
             var point = isTouch ? e.touches[0] : e;
             that.started = true;
-//            that.startX = that.x;
-//            that.startY = that.y;
-//            that.pointX = point.pageX;
-//            that.pointY = point.pageY;
-//            that._log('_start' + that.pointX + ' ' + that.pointY);
-
-
-
             that.moved = false;
             that.animating = false;
             that.zoomed = false;
@@ -256,7 +248,9 @@ function $px(x) {
 
 
         },
+        easing: function () {
 
+        },
 //    utils
         _pos: function (x, y) {
             var that = this;
