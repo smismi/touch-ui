@@ -42,7 +42,7 @@ function $px(x) {
             x: 0,
             y: 0,
             hScroll: true,
-            vScroll: true
+            vScroll: false
         };
 
         // User defined options
@@ -125,22 +125,21 @@ function $px(x) {
             delta = e.wheelDelta;
             that._log(that.altDir);
 
-
+//
 //            if (that.altDir) {
-//                that.hScroll = !that.hScroll;
-//                that.vScroll = !that.vScroll;
+//                var newY = that.y + delta;
+//                var newX = that.x + delta;
 //            } else {
-//                that.hScroll = !that.hScroll;
-//                that.vScroll = !that.vScroll;
+//                var newY = that.y + delta;
+//                var newX = that.x + delta;
 //            }
 
-            if (that.hScroll) deltaX = delta / 4;
-            if (that.vScroll) deltaY = delta / 4;
 
 
 
-            var newY = that.y + delta;
-            var newX = that.x + delta;
+                var newY = that.y + delta;
+                var newX = that.x + delta;
+
             if (newY > 0) {
                 newY = 0;
             }
@@ -153,6 +152,7 @@ function $px(x) {
             if (newX < - that.width + that.w) {
                 newX =  -that.width + that.w;
             }
+
             that._pos(newX, newY);
             that.scrollbarV.style.top = $px(that.y * that.h / -that.height);
             that.scrollbarH.style.left = $px(that.x * that.w / -that.width);
@@ -204,7 +204,7 @@ function $px(x) {
 
         testKey: function(e, q) {
             var that = this;
-            if (e.keyCode == 27) {
+            if (e.keyCode == 18) {
                 that.altDir = q;
             }
         },
@@ -284,8 +284,10 @@ function $px(x) {
 //    utils
         _pos: function (x, y) {
             var that = this;
+
             x = that.hScroll ? x : 0;
             y = that.vScroll ? y : 0;
+
             if (this.options.useTransform) {
                 this.scroller.style[vendor + 'Transform'] = trnOpen + x + 'px,' + y + 'px' + trnClose + ' scale(' + this.scale + ')';
             } else {
@@ -342,9 +344,9 @@ function $px(x) {
                 that.scrollbarH.style.display = "none";
                 that.hScroll = false;
             }
-            if (that.w < that.width && that.h < that.height && !isTouch) {
-                that.hScroll = false;
-            }
+//            if (that.w < that.width && that.h < that.height && !isTouch) {
+//                that.hScroll = false;
+//            }
         },
         getDim : function(el) {
             var that = this;
