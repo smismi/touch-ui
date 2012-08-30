@@ -16,6 +16,9 @@ function $px(x) {
 (function () {
     var m = Math;
     var mround = function (r) { return r >> 0; };
+    var vendor = (/webkit/i).test(navigator.appVersion) ? 'webkit' :
+        (/firefox/i).test(navigator.userAgent) ? 'Moz' :
+            'opera' in window ? 'O' : '';
     //touch extention
     var isAndroid = (/android/gi).test(navigator.appVersion);
     var isIDevice = (/iphone|ipad/gi).test(navigator.appVersion);
@@ -28,6 +31,9 @@ function $px(x) {
     var CANCEL_EV = isTouch ? 'touchcancel' : 'mouseup';
     var MOVE_EV = isTouch ? 'touchmove' : 'mousemove';
     var END_EV = isTouch ? 'touchend' : 'mouseup';
+    // Helpers
+    var trnOpen = 'translate' + '(';
+    var trnClose = ')';
 
     Scroll = function(el, options) {
         var that = this;
@@ -262,8 +268,8 @@ function $px(x) {
             var that = this;
             x = that.hScroll ? x : 0;
             y = that.vScroll ? y : 0;
-            if (this.options.useTransform) {
-                this.scroller.style[vendor + 'Transform'] = trnOpen + x + 'px,' + y + 'px' + trnClose + ' scale(' + this.scale + ')';
+            if (this.options.transform) {
+                this.scroller.style[vendor + 'Transform'] = trnOpen + x + 'px,' + y + 'px' + trnClose + ' scale(1)';
             } else {
                 x = mround(x);
                 y = mround(y);
