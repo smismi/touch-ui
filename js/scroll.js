@@ -28,6 +28,8 @@ function $px(x) {
     var CANCEL_EV = isTouch ? 'touchcancel' : 'mouseup';
     var MOVE_EV = isTouch ? 'touchmove' : 'mousemove';
     var END_EV = isTouch ? 'touchend' : 'mouseup';
+    var KEYDOWN = 'keydown';
+    var KEYUP = 'keyup';
 
     Scroll = function(el, options) {
         var that = this;
@@ -53,6 +55,7 @@ function $px(x) {
         that.h = that.options.h;
         that.vScroll = that.options.vScroll;
         that.hScroll = that.options.hScroll;
+        that.altDir = false;
 
         that.prepareTo();
         that.activateDisabler();
@@ -69,16 +72,17 @@ function $px(x) {
 
 
 
-
-
             that._bind(SCROLL_EV, that.wrapper);
             that._bind(START_EV, that.wrapper);
             that._bind(MOVE_EV, that.wrapper);
             that._bind(END_EV, that.wrapper);
             that._bind(CANCEL_EV, that.wrapper);
+            that._bind(KEYDOWN, document);
+            that._bind(KEYUP, document);
 
 
             that.wrapper.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+
 
         },
 
@@ -102,7 +106,8 @@ function $px(x) {
                 case MOVE_EV: that._move(e); break;
                 case END_EV:
                 case CANCEL_EV: that._end(e); break;
-                case RESIZE_EV: that._resize(); break;
+                case KEYDOWN: that.testKey(e, true); break;
+                case KEYUP: that.testKey(e, false); break;
                 case 'mouseout': that._mouseout(e); break;
                 case 'webkitTransitionEnd': that._transitionEnd(e); break;
             }
@@ -118,13 +123,24 @@ function $px(x) {
 
 
             delta = e.wheelDelta;
+            that._log(that.altDir);
 
+
+//            if (that.altDir) {
+//                that.hScroll = !that.hScroll;
+//                that.vScroll = !that.vScroll;
+//            } else {
+//                that.hScroll = !that.hScroll;
+//                that.vScroll = !that.vScroll;
+//            }
 
             if (that.hScroll) deltaX = delta / 4;
             if (that.vScroll) deltaY = delta / 4;
 
-            var newX = that.x + delta;
+
+
             var newY = that.y + delta;
+            var newX = that.x + delta;
             if (newY > 0) {
                 newY = 0;
             }
@@ -184,6 +200,13 @@ function $px(x) {
             var point = isTouch ? e.touches[0] : e;
             that.started = false;
             that._log('_stop');
+        },
+
+        testKey: function(e, q) {
+            var that = this;
+            if (e.keyCode == 27) {
+                that.altDir = q;
+            }
         },
 
         _move:function (e) {
