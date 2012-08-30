@@ -177,7 +177,7 @@ function $px(x) {
             that.startTime = e.timeStamp || Date.now();
 
             if (that.options.onScrollStart) that.options.onScrollStart.call(that, e);
-
+            //вот такая вот хуйня
         },
         _end: function(e) {
             var that = this;
