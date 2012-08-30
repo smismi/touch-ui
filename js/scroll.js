@@ -42,7 +42,7 @@ function $px(x) {
             x: 0,
             y: 0,
             hScroll: true,
-            vScroll: false
+            vScroll: true
         };
 
         // User defined options
@@ -123,22 +123,23 @@ function $px(x) {
 
 
             delta = e.wheelDelta;
-            that._log(that.altDir);
+            that._log(that.altDir + ' ' + that.hScroll + ' ' + that.vScroll);
 
 //
-//            if (that.altDir) {
-//                var newY = that.y + delta;
-//                var newX = that.x + delta;
-//            } else {
-//                var newY = that.y + delta;
-//                var newX = that.x + delta;
-//            }
+            if (that.altDir) {
+                var newY = that.y + delta;
+                var newX = that.x + delta;
 
-
-
+            } else {
 
                 var newY = that.y + delta;
                 var newX = that.x + delta;
+            }
+
+
+
+
+
 
             if (newY > 0) {
                 newY = 0;
@@ -204,6 +205,8 @@ function $px(x) {
 
         testKey: function(e, q) {
             var that = this;
+            that._log(q);
+
             if (e.keyCode == 18) {
                 that.altDir = q;
             }
