@@ -71,11 +71,6 @@ function $px(x) {
         prepareTo: function () {
             that = this;
             that.drawScroller(that.scroller);
-
-
-
-
-
             that._bind(SCROLL_EV, that.wrapper);
             that._bind(START_EV, that.wrapper);
             that._bind(MOVE_EV, that.wrapper);
