@@ -40,7 +40,8 @@ function $px(x) {
             x: 0,
             y: 0,
             hScroll: true,
-            vScroll: true
+            vScroll: true,
+            transform: true
         };
 
         // User defined options
@@ -57,9 +58,7 @@ function $px(x) {
         that.prepareTo();
         that.activateDisabler();
 
-//        if (isTouch) {
-//            that.bindTouch(that.scroller);
-//        }
+
     };
 
     Scroll.prototype = {
