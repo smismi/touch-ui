@@ -16,6 +16,9 @@ function $px(x) {
 (function () {
     var m = Math;
     var mround = function (r) { return r >> 0; };
+    var vendor = (/webkit/i).test(navigator.appVersion) ? 'webkit' :
+        (/firefox/i).test(navigator.userAgent) ? 'Moz' :
+            'opera' in window ? 'O' : '';
     //touch extention
     var isAndroid = (/android/gi).test(navigator.appVersion);
     var isIDevice = (/iphone|ipad/gi).test(navigator.appVersion);
@@ -30,6 +33,9 @@ function $px(x) {
     var END_EV = isTouch ? 'touchend' : 'mouseup';
     var KEYDOWN = 'keydown';
     var KEYUP = 'keyup';
+        // Helpers
+    var trnOpen = 'translate' + '(';
+    var trnClose = ')';
 
     Scroll = function(el, options) {
         var that = this;
@@ -153,7 +159,6 @@ function $px(x) {
             if (newX < - that.width + that.w) {
                 newX =  -that.width + that.w;
             }
-
             that._pos(newX, newY);
             that.scrollbarV.style.top = $px(that.y * that.h / -that.height);
             that.scrollbarH.style.left = $px(that.x * that.w / -that.width);
@@ -287,12 +292,10 @@ function $px(x) {
 //    utils
         _pos: function (x, y) {
             var that = this;
-
             x = that.hScroll ? x : 0;
             y = that.vScroll ? y : 0;
-
-            if (this.options.useTransform) {
-                this.scroller.style[vendor + 'Transform'] = trnOpen + x + 'px,' + y + 'px' + trnClose + ' scale(' + this.scale + ')';
+            if (this.options.transform) {
+                this.scroller.style[vendor + 'Transform'] = trnOpen + x + 'px,' + y + 'px' + trnClose + ' scale(1)';
             } else {
                 x = mround(x);
                 y = mround(y);
